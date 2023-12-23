@@ -6,13 +6,21 @@ require('dotenv').config();
 const token = process.env.BOT_TOKEN;
 const webAppUrl = 'https://tg-webapp-react.netlify.app';
 
-const bot = new TelegramBot(token, { polling: true });
+let bot;
 const app = express();
 
 app.use(express.json());
 app.use(cors());
   
 const init = () => {
+	if (process.env.NODE_ENV === 'production') {
+		bot = new TelegramBot(token);
+		bot.setWebHook(process.env.HEROKU_URL + bot.token);
+		console.log('--- BOT init ---');
+	} else {
+		bot = new TelegramBot(token, { polling: true });
+	}
+	
 	bot.onText(/\/echo (.+)/, (msg, match) => {
 		const chatId = msg.chat.id;
 		const resp = match[1];
@@ -91,5 +99,5 @@ app.post('/web-data', cors(corsOptions), async (req, res) => {
 	}
 });
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log('Server started on PORT ' + PORT));
