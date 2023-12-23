@@ -58,7 +58,7 @@ const init = () => {
 init();  // Init bot
 
 // Server
-app.post('web/data', async (req, res) => {
+app.post('/web-data', async (req, res) => {
 	const { queryId, products, totalPrice } = req.body;
 
 	try {
