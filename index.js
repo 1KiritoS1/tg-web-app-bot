@@ -11,7 +11,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-
+  
 const init = () => {
 	bot.onText(/\/echo (.+)/, (msg, match) => {
 		const chatId = msg.chat.id;
@@ -57,8 +57,14 @@ const init = () => {
 }
 init();  // Init bot
 
+
 // Server
-app.post('/web-data', async (req, res) => {
+const corsOptions = {
+	origin: 'https://tg-webapp-react.netlify.app',
+	methods: 'POST',
+};
+
+app.post('/web-data', cors(corsOptions), async (req, res) => {
 	const { queryId, products, totalPrice } = req.body;
 
 	try {
@@ -85,5 +91,5 @@ app.post('/web-data', async (req, res) => {
 	}
 });
 
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log('Server started on PORT ' + PORT));
