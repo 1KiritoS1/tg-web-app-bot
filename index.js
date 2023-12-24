@@ -15,7 +15,7 @@ app.use(cors());
 const init = () => {
 	if (process.env.NODE_ENV === 'production') {
 		bot = new TelegramBot(token);
-		bot.setWebHook(process.env.HEROKU_URL + bot.token);
+		bot.setWebHook(`${process.env.HEROKU_URL}/${bot.token}`);
 		console.log('--- BOT init ---');
 	} else {
 		bot = new TelegramBot(token, { polling: true });
@@ -81,7 +81,7 @@ app.post('/web-data', cors(corsOptions), async (req, res) => {
 			id: queryId,
 			title: 'Успешна покупка!',
 			input_message_content: {
-				message_text: 'Поздравляю с покупкой, вы приобрели товар на сумму: $'
+				message_text: 'Поздравляю с покупкой, вы приобрели товар на сумму $'
 				+ totalPrice
 			}
 		});
