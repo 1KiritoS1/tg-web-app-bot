@@ -14,10 +14,10 @@ app.use(cors());
   
 const init = () => {
 	if (process.env.NODE_ENV === 'production') {
+		bot = new TelegramBot(token);
+
 		const webhookUrl = `${process.env.HEROKU_URL}/${bot.token}`;
 		console.log('Webhook URL:', webhookUrl);
-
-		bot = new TelegramBot(token);
 		bot.setWebHook(webhookUrl);
 	} else {
 		bot = new TelegramBot(token, { polling: true });
