@@ -14,9 +14,11 @@ app.use(cors());
   
 const init = () => {
 	if (process.env.NODE_ENV === 'production') {
+		const webhookUrl = `${process.env.HEROKU_URL}/${bot.token}`;
+		console.log('Webhook URL:', webhookUrl);
+
 		bot = new TelegramBot(token);
-		bot.setWebHook(`${process.env.HEROKU_URL}/${bot.token}`);
-		console.log('--- BOT init ---');
+		bot.setWebHook(webhookUrl);
 	} else {
 		bot = new TelegramBot(token, { polling: true });
 	}
@@ -40,7 +42,6 @@ const init = () => {
 					]
 				}
 			});
-
 			await bot.sendMessage(chatId, 'Заходи сюда', {
 				reply_markup: {
 					inline_keyboard: [
@@ -49,7 +50,6 @@ const init = () => {
 				}
 			});
 		}
-
 		if (msg.web_app_data?.data) {
 			try {
 				const data = JSON.parse(msg.web_app_data?.data);
