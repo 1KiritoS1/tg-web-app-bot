@@ -12,68 +12,21 @@ const app = express();
 app.use(express.json());
 app.use(cors());
   
-// const init = () => {
-// 	if (process.env.NODE_ENV === 'production') {
-// 		bot = new TelegramBot(token);
-
-// 		const webhookUrl = process.env.HEROKU_URL + bot.token;
-// 		console.log('Webhook URL:', webhookUrl);
-// 		bot.setWebHook(webhookUrl);
-// 	} else {
-// 		bot = new TelegramBot(token, { polling: true });
-// 	}
-
-// 	bot.onText(/\/echo (.+)/, (msg, match) => {
-// 		try {
-// 			const chatId = msg.chat.id;
-// 			const resp = match[1];
+const initPolling = () => {
+	bot = new TelegramBot(token, { polling: true });
 	
-// 			bot.sendMessage(chatId, resp);
-// 			console.log('bot send message?');
-// 		} catch (e) {
-// 			console.log('ERROR: ', e);
-// 		}
-// 	});
+	console.log('Bot started in the dev mode with polling.');
+}
 
-// 	bot.on('message', async msg => {
-// 		try {
-// 			const text = msg.text;
-// 			const chatId = msg.chat.id;
-	
-// 			if (text === '/start') {
-// 				console.log('bot send message when /start?');
+const initWebhook = () => {
+	bot = new TelegramBot(token);
 
-// 				await bot.sendMessage(chatId, 'Заполни форму', {
-// 					reply_markup: {
-// 						keyboard: [
-// 							[{ text: 'Заполнить форму', web_app: { url: webAppUrl + '/form' } }]
-// 						]
-// 					}
-// 				});
-// 				await bot.sendMessage(chatId, 'Заходи сюда', {
-// 					reply_markup: {
-// 						inline_keyboard: [
-// 							[{ text: 'Сделать заказ', web_app: { url: webAppUrl } }]
-// 						]
-// 					}
-// 				});
-// 			}
-// 			if (msg.web_app_data?.data) {
-// 				try {
-// 					const data = JSON.parse(msg.web_app_data?.data);
-	
-// 					await bot.sendMessage(chatId, 'Спасибо за обратную связь!');
-// 					await bot.sendMessage(chatId, 'Ваша страна: ' + data?.country);
-// 					await bot.sendMessage(chatId, 'Ваша улица: ' + data?.street);
-// 				} catch (e) {
-// 					console.log(e);
-// 				}
-// 			}
-// 		} catch (e) {
-// 			console.log('ERROR BOTTOM: ', e);
-// 		}
-// 	});
-// }
+    const webhookUrl = process.env.HEROKU_URL + bot.token;
+    console.log('Webhook URL:', webhookUrl);
+    bot.setWebHook(webhookUrl);
+
+    console.log('Bot started in the prod mode with webhook.');
+};
 
 if (process.env.NODE_ENV === 'production') {
 	initWebhook();
@@ -128,22 +81,6 @@ bot.on('message', async (msg) => {
 		console.log(e);
 	}
 });
-
-const initPolling = () => {
-	bot = new TelegramBot(token, { polling: true });
-	
-	console.log('Bot started in the dev mode with polling.');
-}
-
-const initWebhook = () => {
-	bot = new TelegramBot(token);
-
-    const webhookUrl = process.env.HEROKU_URL + bot.token;
-    console.log('Webhook URL:', webhookUrl);
-    bot.setWebHook(webhookUrl);
-
-    console.log('Bot started in the prod mode with webhook.');
-};
 
 
 // Server
