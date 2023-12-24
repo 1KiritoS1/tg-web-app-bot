@@ -23,43 +23,56 @@ const init = () => {
 		bot = new TelegramBot(token, { polling: true });
 	}
 	
-	bot.onText(/\/echo (.+)/, (msg, match) => {
-		const chatId = msg.chat.id;
-		const resp = match[1];
+	console.log(`Bot started in the ${process.env.NODE_ENV} mode`);
 
-		bot.sendMessage(chatId, resp);
+	bot.onText(/\/echo (.+)/, (msg, match) => {
+		try {
+			const chatId = msg.chat.id;
+			const resp = match[1];
+	
+			bot.sendMessage(chatId, resp);
+			console.log('bot send message?');
+		} catch (e) {
+			console.log('ERROR: ', e);
+		}
 	});
 
 	bot.on('message', async msg => {
-		const text = msg.text;
-		const chatId = msg.chat.id;
+		try {
+			const text = msg.text;
+			const chatId = msg.chat.id;
+	
+			if (text === '/start') {
+				console.log('bot send message when /start?');
 
-		if (text === '/start') {
-			await bot.sendMessage(chatId, 'Заполни форму', {
-				reply_markup: {
-					keyboard: [
-						[{ text: 'Заполнить форму', web_app: { url: webAppUrl + '/form' } }]
-					]
-				}
-			});
-			await bot.sendMessage(chatId, 'Заходи сюда', {
-				reply_markup: {
-					inline_keyboard: [
-						[{ text: 'Сделать заказ', web_app: { url: webAppUrl } }]
-					]
-				}
-			});
-		}
-		if (msg.web_app_data?.data) {
-			try {
-				const data = JSON.parse(msg.web_app_data?.data);
-
-				await bot.sendMessage(chatId, 'Спасибо за обратную связь!');
-				await bot.sendMessage(chatId, 'Ваша страна: ' + data?.country);
-				await bot.sendMessage(chatId, 'Ваша улица: ' + data?.street);
-			} catch (e) {
-				console.log(e);
+				await bot.sendMessage(chatId, 'Заполни форму', {
+					reply_markup: {
+						keyboard: [
+							[{ text: 'Заполнить форму', web_app: { url: webAppUrl + '/form' } }]
+						]
+					}
+				});
+				await bot.sendMessage(chatId, 'Заходи сюда', {
+					reply_markup: {
+						inline_keyboard: [
+							[{ text: 'Сделать заказ', web_app: { url: webAppUrl } }]
+						]
+					}
+				});
 			}
+			if (msg.web_app_data?.data) {
+				try {
+					const data = JSON.parse(msg.web_app_data?.data);
+	
+					await bot.sendMessage(chatId, 'Спасибо за обратную связь!');
+					await bot.sendMessage(chatId, 'Ваша страна: ' + data?.country);
+					await bot.sendMessage(chatId, 'Ваша улица: ' + data?.street);
+				} catch (e) {
+					console.log(e);
+				}
+			}
+		} catch (e) {
+			console.log('ERROR BOTTOM: ', e);
 		}
 	});
 }
@@ -81,8 +94,10 @@ app.post('/web-data', cors(corsOptions), async (req, res) => {
 			id: queryId,
 			title: 'Успешна покупка!',
 			input_message_content: {
-				message_text: 'Поздравляю с покупкой, вы приобрели товар на сумму $'
-				+ totalPrice
+				message_text: `
+					Поздравляю с покупкой, вы приобрели товар на сумму $${totalPrice}\n
+					${products.map(item => item.title).join(', ')}
+				`
 			}
 		});
 		return res.status(200).json({});
