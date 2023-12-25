@@ -28,11 +28,10 @@ if (process.env.NODE_ENV === 'production') {
 	initPolling();
 }
 
-bot.on('message', function onMessage(msg) {
-	bot.sendMessage(msg.chat.id, 'Я тестовый бот. Чтобы ознакомиться с моим функционалом, введите /start');
-});
-
 bot.on('message', async (msg) => {
+	const text = msg.text;
+	const chatId = msg.chat.id;
+
 	if (text === '/start') {
 		await bot.sendMessage(chatId, 'Заполни форму', {
 			reply_markup: {
