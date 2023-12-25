@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.post(`/${process.env.BOT_TOKEN}`, async (req, res) => {
+app.post('/web-data', async (req, res) => {
 	const { queryId, products, totalPrice } = req.body;
 
 	try {
