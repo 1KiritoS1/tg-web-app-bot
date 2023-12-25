@@ -22,7 +22,7 @@ app.post(`/${process.env.BOT_TOKEN}`, async (req, res) => {
 			}
 		});
 		bot.processUpdate(req.body);
-		return res.status(200).json({ message: 'Ok' });
+		res.status(200).json({ message: 'Ok' });
 	} catch (e) {
 		await bot.answerWebAppQuery(queryId, {
 			type: 'article',
@@ -32,7 +32,7 @@ app.post(`/${process.env.BOT_TOKEN}`, async (req, res) => {
 				message_text: 'Не удалось приобрести товар :(' 
 			}
 		});
-		return res.status(500).json({ message: 'Error' });
+		res.status(500).json({ message: 'Error' });
 	}
 });
 
