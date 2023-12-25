@@ -34,51 +34,37 @@ if (process.env.NODE_ENV === 'production') {
 	initPolling();
 }
 
-bot.onText(/\/echo (.+)/, (msg, match) => {
-	try {
-		const chatId = msg.chat.id;
-		const resp = match[1];
-
-		bot.sendMessage(chatId, resp);
-	} catch (e) {
-		console.log(e);
-	}
+bot.on('message', function onMessage(msg) {
+	bot.sendMessage(msg.chat.id, 'Я тестовый бот. Чтобы ознакомиться с моим функционалом, введите /start');
 });
 
 bot.on('message', async (msg) => {
-	try {
-		const text = msg.text;
-		const chatId = msg.chat.id;
-
-		if (text === '/start') {
-			await bot.sendMessage(chatId, 'Заполни форму', {
-				reply_markup: {
-					keyboard: [
-						[{ text: 'Заполнить форму', web_app: { url: webAppUrl + '/form' } }]
-					]
-				}
-			});
-			await bot.sendMessage(chatId, 'Заходи сюда', {
-				reply_markup: {
-					inline_keyboard: [
-						[{ text: 'Сделать заказ', web_app: { url: webAppUrl } }]
-					]
-				}
-			});
-		}
-		if (msg.web_app_data?.data) {
-			try {
-				const data = JSON.parse(msg.web_app_data?.data);
-
-				await bot.sendMessage(chatId, 'Спасибо за обратную связь!');
-				await bot.sendMessage(chatId, 'Ваша страна: ' + data?.country);
-				await bot.sendMessage(chatId, 'Ваша улица: ' + data?.street);
-			} catch (e) {
-				console.log(e);
+	if (text === '/start') {
+		await bot.sendMessage(chatId, 'Заполни форму', {
+			reply_markup: {
+				keyboard: [
+					[{ text: 'Заполнить форму', web_app: { url: webAppUrl + '/form' } }]
+				]
 			}
+		});
+		await bot.sendMessage(chatId, 'Заходи сюда', {
+			reply_markup: {
+				inline_keyboard: [
+					[{ text: 'Сделать заказ', web_app: { url: webAppUrl } }]
+				]
+			}
+		});
+	}
+	if (msg.web_app_data?.data) {
+		try {
+			const data = JSON.parse(msg.web_app_data?.data);
+
+			await bot.sendMessage(chatId, 'Спасибо за обратную связь!');
+			await bot.sendMessage(chatId, 'Ваша страна: ' + data?.country);
+			await bot.sendMessage(chatId, 'Ваша улица: ' + data?.street);
+		} catch (e) {
+			console.log(e);
 		}
-	} catch (e) {
-		console.log(e);
 	}
 });
 
@@ -98,10 +84,8 @@ app.post('/web-data', cors(corsOptions), async (req, res) => {
 			id: queryId,
 			title: 'Успешна покупка!',
 			input_message_content: {
-				message_text: `
-					Поздравляю с покупкой, вы приобрели товар на сумму $${totalPrice}\n
-					${products.map(item => item.title).join(', ')}
-				`
+				message_text: `Поздравляю с покупкой, вы приобрели товар на сумму $${totalPrice}\n
+				"${products.map(item => item.title).join(', ')}"`
 			}
 		});
 		return res.status(200).json({});
